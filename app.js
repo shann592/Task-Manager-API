@@ -14,6 +14,11 @@ const cors = require("cors");
 const xss = require("xss-clean");
 const rateLimit = require("express-rate-limit");
 
+// swagger UI
+const yaml = require("yamljs");
+const swaggerUI = require("swagger-ui-express");
+const swaggerDoc = yaml.load("./swagger.yaml");
+
 // rate limit prevent same IP to make to many request
 app.set("trust proxy", 1);
 const limiter = rateLimit({
@@ -27,6 +32,15 @@ app.use(express.json());
 app.use(helmet());
 app.use(cors());
 app.use(xss());
+
+// swagger UI route
+app.get("/", (req, res) => {
+  res.send(
+    "<h1 styles='font-family: consolas'>Task Manager API</h1><a href='/api-docs'>Documentation</a>"
+  );
+});
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
+
 // routes
 const authRouter = require("./routes/auth.js");
 const tasksRouter = require("./routes/tasks.js");
